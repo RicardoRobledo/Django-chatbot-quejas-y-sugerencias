@@ -1,0 +1,9 @@
+#### tarea
+este es el contenido de una tabla con mensajes.
+
+$markdown_table
+
+responde la pregunta del usuario.
+
+#### pregunta
+$message

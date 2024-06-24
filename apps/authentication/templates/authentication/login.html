@@ -1,0 +1,45 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <title>Login</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <div class="background">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    <form id="login-form" method="post">
+        {% csrf_token %}
+        <p><img width="100px" height="100px" class="rounded-image"></p>
+
+        <p><label for="username">Username</label></p>
+        {{ form.username }}
+
+        <p><label for="password">Password</label></p>
+        {{ form.password }}
+
+        <label id="message">Error, usuario y/o contraseña incorrectos</label>
+        <button type="submit" id="login">Log In</button>
+    </form>
+
+    <div>
+        <div class="wave"></div>
+     </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="{% static 'js/login.js' %}"></script>
+</body>
+
+</html>
