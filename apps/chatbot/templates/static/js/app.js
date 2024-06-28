@@ -104,7 +104,6 @@ async function send_message(id, user_message, signal){
   const message_url = url + 'chatbot/message/';
   const thread_id = localStorage.getItem('thread_id');
   const dates = JSON.parse(localStorage.getItem('dates'));
-  const tokens = JSON.parse(localStorage.getItem('tokens'));
 
   const response = await fetch(message_url, {
     signal: signal,
@@ -112,8 +111,7 @@ async function send_message(id, user_message, signal){
     mode: 'same-origin',
     headers: {
       'X-CSRFToken': csrftoken,
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${tokens['access_token']}`
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({ dates, thread_id, user_message })
   }).then(async (response) => {
@@ -378,6 +376,7 @@ class PaymentRequiredError extends CustomError {
 $(document).ready(async function() {
 
   await initialize();
+
   $("h6").text(`{{assistant_name}}`.replace("{{assistant_name}}", assistant_name));
 
   $(".loader-wrapper").fadeOut(1200, function() {
