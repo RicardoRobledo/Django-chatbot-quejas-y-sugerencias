@@ -1,7 +1,10 @@
 import time
-from openai import AsyncOpenAI
+import base64
 
 from django.conf import settings
+from rest_framework import status
+from openai import AsyncOpenAI
+#from openai.types.beta.threads import ImageFileContentBlock, TextContentBlock
 
 
 __author__ = 'Ricardo'
@@ -90,20 +93,45 @@ class OpenAISingleton():
 
             time.sleep(0.1)
 
-        return run.id
+            #if run.status=='failed':
+            #    print(run.last_error)
+            #    print(run.last_error.code)
+
+        return run
 
 
     @classmethod
-    async def retrieve_message(cls, thread_id:str):
+    async def retrieve_message(cls, run, thread_id:str):
         """
         This method return the answer from the assistant
         """
 
-        messages = await cls.__client.beta.threads.messages.list(
-            thread_id=thread_id
-        )
+        message = {'data':{}, 'status_code':status.HTTP_200_OK}
 
-        return messages.data[0].content[0].text.value
+        if run.status=='failed' and run.last_error.code=='rate_limit_exceeded':
+
+            message['data'] = {'msg':'Error, el límite de cuota ha sido alcanzado, por favor verifique su crédito', 'error':'rate_limit_exceeded'}
+            message['status_code'] = status.HTTP_402_PAYMENT_REQUIRED
+
+            return message
+
+        messages = (await cls.__client.beta.threads.messages.list(
+            thread_id=thread_id
+        )).data[0].content
+
+        if len(messages)==1:
+            message['data'] = {'msg':messages[0].text.value}
+        else:
+
+            image = messages[0]
+
+            image_file_id = image.image_file.file_id
+            image_file = await cls.__client.files.content(image_file_id)
+
+            # ImageFileContentBlock - TextContentBlock
+            message['data'] = {'img':base64.b64encode(image_file.read()).decode('utf-8'), 'msg':messages[1].text.value}
+
+        return message
 
 
     @classmethod

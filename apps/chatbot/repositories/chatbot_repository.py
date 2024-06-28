@@ -34,6 +34,6 @@ async def send_message(dates:str, thread_id:str, message:str):
     prompt_result = fill_out_prompt(prompt, {'markdown_table':markdown_table, 'message':message})
 
     await OpenAISingleton.create_message(thread_id, prompt_result)
-    await OpenAISingleton.run_thread(thread_id)
+    run = await OpenAISingleton.run_thread(thread_id)
 
-    return await OpenAISingleton.retrieve_message(thread_id)
+    return await OpenAISingleton.retrieve_message(run, thread_id)

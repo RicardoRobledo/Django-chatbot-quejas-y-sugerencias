@@ -12,7 +12,7 @@ from django.views.decorators.cache import never_cache
 from django.template.response import TemplateResponse
 
 from ..desing_patterns.creational_patterns.singleton.openai_singleton import OpenAISingleton
-from .services import chatbot_service
+from .repositories import chatbot_repository
 
 
 @method_decorator(require_http_methods(["POST"]), name='dispatch')
@@ -24,8 +24,8 @@ class SendMessageView(View):
         user_message = body.get('user_message')
         dates = body.get('dates')
         
-        response = await chatbot_service.send_message(dates, thread_id, user_message)
-        return JsonResponse({'msg': response})
+        response = await chatbot_repository.send_message(dates, thread_id, user_message)
+        return JsonResponse(data=response['data'], status=response['status_code'])
 
 
 @method_decorator(require_http_methods(["GET"]), name='dispatch')
@@ -45,7 +45,7 @@ class DeleteThreadView(View):
         return JsonResponse({})
 
 
-@method_decorator(login_required(login_url='/authentication/login/'), name='dispatch')
+@method_decorator(login_required(login_url=settings.LOGIN_URL), name='dispatch')
 @method_decorator(never_cache, name='dispatch')
 class ChatView(View):
 

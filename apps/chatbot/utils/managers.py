@@ -19,7 +19,6 @@ class GoogleSheetManager():
         """
 
         df = pd.read_csv(f'https://docs.google.com/spreadsheets/d/{settings.GOOGLE_SHEET_ID}/export?format=csv')
-        df = df.drop(columns=['Correo', 'Nombre'])
         df['Fecha del mensaje'] = pd.to_datetime(df['Fecha del mensaje'], format='%d/%m/%Y %H:%M:%S')
 
         return df

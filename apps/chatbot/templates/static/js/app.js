@@ -4,6 +4,8 @@ const assistant_name = 'Asistente de quejas';
 const welcome_message = '👋 ¡Hola!, ¿Que necesitas saber el día de hoy?';
 let id_mensaje = 0;
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+const md = window.markdownit();
+
 
 // --------------------------------------------------
 //                    functions
@@ -114,19 +116,65 @@ async function send_message(id, user_message, signal){
       'Authorization': `Bearer ${tokens['access_token']}`
     },
     body: JSON.stringify({ dates, thread_id, user_message })
+  }).then(async (response) => {
+
+    if(response.status===402){
+      throw new PaymentRequiredError('Error, se ha alcanzado alcanzado el límite de saldo');
+    }else{
+      return response.json();
+    }
+
   }).then(
-    response => response.json()
-  ).then(
     async (data) => {
-      const md = window.markdownit();
-      const resultHtml = md.render(data['msg']);
-      $(`#${id} .m-2 p`).append(resultHtml);
+
+      const msg = data['msg'];
+      let resultHtml = '';
+      
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(msg, 'text/html');
+
+      if('img' in data){
+
+        resultHtml = md.render(msg);
+        $(`#${id} .m-2`).append(resultHtml);
+        $(`#${id} .m-2`).append(`<img src="data:image/png;base64,${data['img']}" class="img-fluid">`);
+        console.log('FIN');
+      
+      }else if (Array.from(doc.body.childNodes).some(node => node.nodeType === 1)) {
+
+        const table = `
+        <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <p class="fw-semibold">Tabla generada</p>
+    </div>
+    <div class="card-body">
+      <div class="container">
+        <div class="table-responsive">
+          ${doc.body.innerHTML}
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+        $(`#${id} .m-2 p`).html(table);
+        $('table').addClass('table table-warning table-bordered table-hover');
+        $(`#${id} #chatbot-message-content`).addClass('flex-column');
+
+      }else{
+      
+        resultHtml = md.render(msg);
+        $(`#${id} .m-2 p`).append(resultHtml);
+      
+      }
+
     }
   ).catch(error => {
 
-    if (error.name === 'AbortError') {
+    if (error.name==='AbortError') {
       $(`#${id} .m-2 p`).append('<h7 class="text-secondary">Mensaje detenido<h7>');
-    } else {
+    } else if(error.name==='PaymentRequiredError'){
+      $(`#${id} .m-2 p`).append('<h7 class="text-danger">Error, el límite de cuota ha sido alcanzado, por favor verifique su crédito<h7>');
+    }else {
       $(`#${id} .m-2 p`).append('<h7 class="text-danger">Hubo un error en el mensaje<h7>');
     }
   
@@ -302,6 +350,25 @@ $(window).on('beforeunload', async function() {
 
 });
 
+
+// --------------------------------------------------
+//                 custom exceptions
+// --------------------------------------------------
+
+
+class CustomError extends Error {
+  constructor(name, message) {
+      super(message);
+      this.name = name;
+  }
+}
+
+// Otra clase de error personalizada
+class PaymentRequiredError extends CustomError {
+  constructor(message) {
+      super('PaymentRequiredError', message);
+  }
+}
 
 // --------------------------------------------------
 //                 initialization
