@@ -377,12 +377,6 @@ class PaymentRequiredError extends CustomError {
 
 $(document).ready(async function() {
 
-  const tokens = localStorage.getItem('tokens');
-
-  if(!tokens){
-    window.location.href = '/frontend/login';
-  }
-
   await initialize();
   $("h6").text(`{{assistant_name}}`.replace("{{assistant_name}}", assistant_name));
 
