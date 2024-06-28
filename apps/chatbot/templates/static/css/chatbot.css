@@ -2,27 +2,11 @@ body{
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-weight: 100 !important;
     font-style: normal !important;
-    background-color: hsl(0, 0%, 100%) !important;
+    background-color: #f7f9fc !important;
 }
 
 .navbar {
-    background-color: rgb(255, 255, 255) !important;
-}
-
-.procedure-container{
-    background-color: rgb(60, 120, 248);
-    border-radius: 5px;
-    margin-inline: 10px;
-    margin-top: 5px;
-    color: white;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    cursor:pointer;
-}
-
-.procedure-container:hover{
-    background-color: rgb(109, 156, 255);
+    background-color: hsl(0, 0%, 17%) !important;
 }
 
 #chat-button{
@@ -41,7 +25,7 @@ hr{
 
 .chatbot-message{
     /*background-color: hsl(0, 0%, 40%) !important;*/
-    background-color: hsl(0, 0%, 100%) !important;
+    background-color: #f7f9fc !important;
 }
 
 #chatbot-message-content{
@@ -53,7 +37,7 @@ hr{
 }
 
 .user-message{
-    background-color: hsl(150, 54%, 58%) !important;
+    background-color: rgb(62, 213, 243) !important;
 }
 
 #user-message-content{
@@ -84,7 +68,7 @@ hr{
 }
 
 .initial-message-container:hover{
-    background-color: rgb(252, 215, 159);
+    background-color: rgb(62, 213, 243);
     cursor: pointer;
 }
 
@@ -117,7 +101,7 @@ hr{
 .pelotas {
     width: 8px;
     height: 8px;
-    background-color: #2a4ce2;
+    background-color: rgb(54, 185, 211);
     animation: salto .5s alternate
     infinite;
     border-radius: 50%  
@@ -180,7 +164,7 @@ hr{
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgb(60, 120, 248);
+    background-color: rgb(83, 189, 250);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -188,7 +172,7 @@ hr{
 
 .loader {
     border: 16px solid #ffffff; /* Light grey */
-    border-top: 16px solid #3498db; /* Blue */
+    border-top: 16px solid rgb(114, 203, 255); /* Blue */
     border-radius: 50%;
     width: 120px;
     height: 120px;

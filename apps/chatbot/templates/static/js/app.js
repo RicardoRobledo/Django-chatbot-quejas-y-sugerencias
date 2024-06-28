@@ -16,7 +16,7 @@ function format_chatbot_message(id){
   const chatbotMessage = `
   <div class='chatbot-message col-12 py-4 d-flex justify-content-center' id='${id}' style='display:none;'>
       <div class='d-flex col-8' id='chatbot-message-content'>
-          <img src='/static/imgs/chatbot.png' width='40' height='40'>
+          <img src='/static/imgs/chatbot.png' width='60' height='60'>
           <div class='m-2'>
               <h6>${assistant_name}</h6>
               <p></p>
@@ -41,7 +41,7 @@ function format_user_message(message){
   const userMessage = `
   <div class='user-message col-12 py-4 d-flex justify-content-center'>
       <div class='d-flex col-8' id='user-message-content'>
-          <img src='/static/imgs/admin.png' width='40' height='40'>
+          <img src='/static/imgs/admin.png' width='60' height='60'>
           <div class='m-2'>
               <h6>Tú</h6>
               <p>${message}</p>

@@ -39,7 +39,7 @@
                 <div class="">
                     <form method="post" action="{% url 'authentication_app:logout' %}">
                         {% csrf_token %}
-                        <button class="btn btn-danger" id="btn-logout" type="submit" aria-expanded="false">
+                        <button class="btn btn-secondary" id="btn-logout" type="submit" aria-expanded="false">
                             Cerrar sesión
                         </button>
                     </form>
@@ -54,7 +54,7 @@
         <div class="conversation">
             <div class="chatbot-message col-12 py-4 d-flex justify-content-center">
                 <div class="d-flex col-8" id="chatbot-message-content">
-                    <img src="{% static 'imgs/chatbot.png' %}" width="40" height="40">
+                    <img src="{% static 'imgs/chatbot.png' %}" width="60" height="60">
                     <div class="m-2" id="message-container">
                         <h6>{{assistant_name}}</h6>
                         <p>Bienvenido, por favor indicame el rango de tiempo de las quejas y sugerencias que quieres
@@ -70,7 +70,7 @@
                                     <input type="date" class="form-control" id="datepicker2">
                                 </li>
                             </ul>
-                            <button class="btn btn-success" id="confirm-button">Confirmar</button>
+                            <button class="btn btn-info text-white" id="confirm-button">Confirmar</button>
                         </form>
                         <p class="text-center">
                             <span class="badge text-bg-danger my-2" style="font-size:0.8rem; display:none;"
