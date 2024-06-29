@@ -70,7 +70,7 @@ class OpenAISingleton():
             content=message
         )
 
-        return message.id
+        return message
 
 
     @classmethod

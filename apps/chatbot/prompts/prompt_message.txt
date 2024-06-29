@@ -1,9 +1,4 @@
-#### tarea
-este es el contenido de una tabla con mensajes.
-
-$markdown_table
-
-responde la pregunta del usuario.
+Responde la pregunta del usuario en base a la tabla de mensajes y al historial de conversacion.
 
 #### pregunta
 $message

@@ -103,7 +103,6 @@ async function send_message(id, user_message, signal){
 
   const message_url = url + 'chatbot/message/';
   const thread_id = localStorage.getItem('thread_id');
-  const dates = JSON.parse(localStorage.getItem('dates'));
 
   const response = await fetch(message_url, {
     signal: signal,
@@ -113,7 +112,7 @@ async function send_message(id, user_message, signal){
       'X-CSRFToken': csrftoken,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ dates, thread_id, user_message })
+    body: JSON.stringify({thread_id, user_message})
   }).then(async (response) => {
 
     if(response.status===402){
@@ -136,8 +135,7 @@ async function send_message(id, user_message, signal){
         resultHtml = md.render(msg);
         $(`#${id} .m-2`).append(resultHtml);
         $(`#${id} .m-2`).append(`<img src="data:image/png;base64,${data['img']}" class="img-fluid">`);
-        console.log('FIN');
-      
+
       }else if (Array.from(doc.body.childNodes).some(node => node.nodeType === 1)) {
 
         const table = `
@@ -256,7 +254,7 @@ $('#input-message').on('keyup', function(event){
 });
 
 
-$('#confirm-button').click(function(event) {
+$('#confirm-button').click(async function(event) {
 
   event.preventDefault();
 
@@ -278,15 +276,32 @@ $('#confirm-button').click(function(event) {
       $(this).delay(2000).fadeOut(900);
     });
   }else{
-    localStorage.setItem('dates', JSON.stringify({'from_date':fromDate, 'to_date':toDate}));
 
-    $('#btn-enviar').fadeIn(900)
-    $('#input-message').show(900);
-    $('#form-calendar').hide();
-    $('#message-container p').remove();
-    $('#message-container form').remove();
-    $('#success-badge').fadeIn(900);
-    $('#initial-cards-container').fadeIn(900);
+    const thread_id = localStorage.getItem('thread_id');
+
+    await fetch(url+'chatbot/dates/', {
+      method: 'POST',
+      mode: 'same-origin',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({'thread_id':thread_id, 'dates':{'from_date':fromDate, 'to_date':toDate}})
+    }).then(async (response) => {
+
+      if(response.status===200){
+
+        $('#btn-enviar').fadeIn(900)
+        $('#input-message').show(900);
+        $('#form-calendar').hide();
+        $('#message-container p').remove();
+        $('#message-container form').remove();
+        $('#success-badge').fadeIn(900);
+        $('#initial-cards-container').fadeIn(900);
+
+      }
+
+    })
   }
 
 });

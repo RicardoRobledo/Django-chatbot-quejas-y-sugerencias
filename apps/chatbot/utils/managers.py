@@ -1,12 +1,23 @@
 from string import Template
+from datetime import datetime
 
 import pandas as pd
+from tabulate import tabulate
 
 from django.conf import settings
 
 
 __author__ = 'Ricardo Robledo'
 __version__ = '1.0'
+
+
+def normalize_date(date:str):
+
+    date_string = date.replace('Z', '+00:00')
+    date = datetime.fromisoformat(date_string)
+    normalized_date = date.strftime('%Y-%m-%d')
+
+    return normalized_date
 
 
 class GoogleSheetManager():
@@ -24,24 +35,52 @@ class GoogleSheetManager():
         return df
 
 
-def read_prompt(prompt_file:str):
-    """
-    This method read a file and return a prompt template
-    """
+    @classmethod
+    async def convert_table_from_dates(cls, dates:dict):
+        """
+        This method build a markdown table from a pandas dataframe given a date range.
 
-    with open(f'apps/chatbot/prompts/{prompt_file}.txt') as file:
-        file_content = file.read()
+        :param dates: dictionary with date range
+        :return: markdown table
+        """
 
-    return file_content
+        result = await cls.read_google_sheets()
+        result['Fecha del mensaje'] = result['Fecha del mensaje'].dt.normalize()
+
+        from_date = normalize_date(dates['from_date'])
+        to_date = normalize_date(dates['to_date'])
+
+        filtered_result = result[
+            (result['Fecha del mensaje'] >= from_date) &
+            (result['Fecha del mensaje'] <= to_date)
+        ]
+
+        return tabulate(filtered_result, headers='keys', tablefmt='pipe', showindex=False)
 
 
-def fill_out_prompt(prompt:str, variables:dict):
-    """
-    This method fill out a prompt template
+class PromptManager():
 
-    :return: prompt filled out
-    """
 
-    prompt_result = Template(prompt).substitute(**variables)
+    @classmethod
+    def read_prompt(cls, prompt_file:str):
+        """
+        This method read a file and return a prompt template
 
-    return prompt_result
+        :param prompt_file: file name to make the prompt
+        """
+
+        with open(f'apps/chatbot/prompts/{prompt_file}.txt') as file:
+            file_content = file.read()
+
+        return file_content
+
+
+    @classmethod
+    def fill_out_prompt(cls, prompt:str, variables:dict):
+        """
+        This method fill out a prompt template
+
+        :return: prompt filled out
+        """
+
+        return Template(prompt).substitute(**variables)

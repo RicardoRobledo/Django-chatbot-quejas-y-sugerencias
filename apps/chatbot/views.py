@@ -2,6 +2,7 @@ import json
 
 from asgiref.sync import sync_to_async
 
+from http import HTTPStatus
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views import View
@@ -22,10 +23,21 @@ class SendMessageView(View):
         body = json.loads(request.body)
         thread_id = body.get('thread_id')
         user_message = body.get('user_message')
+        
+        response = await chatbot_repository.send_message(thread_id, user_message)
+        return JsonResponse(data=response['data'], status=response['status_code'])
+
+
+@method_decorator(require_http_methods(["POST"]), name='dispatch')
+class SendDateRange(View):
+
+    async def post(self, request, *args, **kwargs):
+        body = json.loads(request.body)
+        thread_id = body.get('thread_id')
         dates = body.get('dates')
         
-        response = await chatbot_repository.send_message(dates, thread_id, user_message)
-        return JsonResponse(data=response['data'], status=response['status_code'])
+        await chatbot_repository.send_date_range(thread_id, dates)
+        return JsonResponse(data={}, status=HTTPStatus.OK)
 
 
 @method_decorator(require_http_methods(["GET"]), name='dispatch')
