@@ -5,7 +5,7 @@ from ..utils.managers import GoogleSheetManager, PromptManager
 async def send_message(thread_id:str, message:str):
 
     # Making prompt
-    prompt = PromptManager.read_prompt('prompt_message')
+    prompt = await PromptManager.read_prompt('prompt_message')
     prompt_result = PromptManager.fill_out_prompt(prompt, {'message':message})
 
     # Sending prompt message
@@ -22,8 +22,14 @@ async def send_date_range(thread_id:str, dates:dict):
     markdown_table = await GoogleSheetManager.convert_table_from_dates(dates)
 
     # Making prompt
-    prompt = PromptManager.read_prompt('prompt_table')
+    prompt = await PromptManager.read_prompt('prompt_table')
     prompt_result = PromptManager.fill_out_prompt(prompt, {'markdown_table':markdown_table})
+
+    print(prompt)
+    print('-------------------')
+    print(prompt_result)
+    print('-------------------')
+    print(markdown_table)
 
     # Sending prompt message
     await OpenAISingleton.create_message(thread_id, prompt_result)

@@ -1,5 +1,5 @@
+//const url = 'http://127.0.0.1:8000/';
 const url = 'https://django-chatbot-quejas-y-sugerencias.onrender.com/';
-//const url = 'https://fastapi-chatbot-quejas-y-sugerencias.onrender.com/api/v1/';
 const assistant_name = 'Asistente de quejas';
 const welcome_message = '👋 ¡Hola!, ¿Que necesitas saber el día de hoy?';
 let id_mensaje = 0;
@@ -80,8 +80,6 @@ function enable_form_message(){
 
 async function initialize(){
 
-  await create_conversational_thread();
-  
   let send_button = $('#btn-enviar');
   send_button.css('background-color', '#c5c5c5');
   send_button.css('color', '#000000');
@@ -89,6 +87,7 @@ async function initialize(){
   $('#btn-detener').hide();
   hide_message_container();
   $('#initial-cards-container').hide();
+
 }
 
 
@@ -180,40 +179,63 @@ async function send_message(id, user_message, signal){
 }
 
 
-async function delete_conversation_thread(){
-	var requestOptions = {
-		method: 'POST',
+async function create_conversation_thread(fromDate, toDate){
+
+  const response = await fetch(url+'chatbot/thread_id/', {
+    
+    method: 'POST',
     mode: 'same-origin',
     headers: {
       'X-CSRFToken': csrftoken,
-			'Content-Type': 'application/json',
-		}
-	};
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({'dates':{'from_date':fromDate, 'to_date':toDate}})
 
-  const thread_url = url+'chatbot/thread_id/'+localStorage.getItem('thread_id')+'/'
-	navigator.sendBeacon(thread_url, requestOptions);
+  }).then(async (response) => {
 
-	localStorage.removeItem('thread_id');
+    if(response.status===200){
+      return response.json();
+    }
+
+  }).then(async (data)=>{
+    
+    $('#btn-enviar').fadeIn(900)
+    $('#input-message').show(900);
+    $('#form-calendar').hide();
+    $('#message-container p').remove();
+    $('#message-container form').remove();
+    $('#success-badge').fadeIn(900);
+    $('#initial-cards-container').fadeIn(900);
+
+    return data;
+  
+  });
+
+  localStorage.setItem('thread_id', response['thread_id']);
+
 }
 
 
-async function create_conversational_thread(){
+async function delete_conversation_thread(){
 
-  const thread_url = url+'chatbot/thread_id';
-  //let url = '';
-  const response = await fetch(thread_url, {
-    method: 'GET',
-    mode: 'same-origin',
-    headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' },
-  }).then(response => response.json())
-    .then(data => data
-    ).catch(error => {
-      return {'msg':'<h7 class="text-danger">Error, no se ha podido establecer una conversacion<h7>'};
-    });
+  if(localStorage.getItem('thread_id')!==null){
+
+    var requestOptions = {
+      method: 'POST',
+      mode: 'same-origin',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/json',
+      }
+    };
   
-  localStorage.setItem('thread_id', response['thread_id']);
+    const thread_url = url+'chatbot/thread_id/'+localStorage.getItem('thread_id')+'/'
+    navigator.sendBeacon(thread_url, requestOptions);
+  
+    localStorage.removeItem('thread_id');
 
-  return response;
+  }
+	
 }
 
 
@@ -266,42 +288,23 @@ $('#confirm-button').click(async function(event) {
   const toDate = new Date($('#datepicker2').val());
 
   if (!isValidDate(fromDate) || !isValidDate(toDate)) {
+    
     $('#warning-badge').text('Una o ambas fechas son inválidas');
     $('#warning-badge').fadeIn(900, function(){
       $(this).delay(2000).fadeOut(900);
     });
+  
   }else if(fromDate>toDate){
+  
     $('#warning-badge').text('La fecha inicial no puede ser mayor a la fecha final');
     $('#warning-badge').fadeIn(900, function(){
       $(this).delay(2000).fadeOut(900);
     });
+  
   }else{
-
-    const thread_id = localStorage.getItem('thread_id');
-
-    await fetch(url+'chatbot/dates/', {
-      method: 'POST',
-      mode: 'same-origin',
-      headers: {
-        'X-CSRFToken': csrftoken,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({'thread_id':thread_id, 'dates':{'from_date':fromDate, 'to_date':toDate}})
-    }).then(async (response) => {
-
-      if(response.status===200){
-
-        $('#btn-enviar').fadeIn(900)
-        $('#input-message').show(900);
-        $('#form-calendar').hide();
-        $('#message-container p').remove();
-        $('#message-container form').remove();
-        $('#success-badge').fadeIn(900);
-        $('#initial-cards-container').fadeIn(900);
-
-      }
-
-    })
+  
+    await create_conversation_thread(fromDate, toDate);
+  
   }
 
 });

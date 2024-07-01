@@ -11,5 +11,4 @@ urlpatterns = [
     path('thread_id/', views.CreateThreadView.as_view()),
     path('thread_id/<int:thread_id>/', views.DeleteThreadView.as_view()),
     path('message/', views.SendMessageView.as_view()),
-    path('dates/', views.SendDateRange.as_view())
 ]

@@ -34,7 +34,7 @@ class OpenAISingleton():
 
             # making connection
             cls.__client = cls.__get_connection()
-        
+
         return cls.__client
     
 

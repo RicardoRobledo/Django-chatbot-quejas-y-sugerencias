@@ -29,24 +29,18 @@ class SendMessageView(View):
 
 
 @method_decorator(require_http_methods(["POST"]), name='dispatch')
-class SendDateRange(View):
-
-    async def post(self, request, *args, **kwargs):
-        body = json.loads(request.body)
-        thread_id = body.get('thread_id')
-        dates = body.get('dates')
-        
-        await chatbot_repository.send_date_range(thread_id, dates)
-        return JsonResponse(data={}, status=HTTPStatus.OK)
-
-
-@method_decorator(require_http_methods(["GET"]), name='dispatch')
 class CreateThreadView(View):
 
-    async def get(self, request, *args, **kwargs):
-        OpenAISingleton()
+    async def post(self, request, *args, **kwargs):
+        
+        body = json.loads(request.body)
+        dates = body.get('dates')
+
         thread_id =  await OpenAISingleton.create_thread()
-        return JsonResponse({'thread_id':thread_id.id})
+        print(thread_id)
+
+        await chatbot_repository.send_date_range(thread_id.id, dates)
+        return JsonResponse(data={'thread_id':thread_id.id}, status=HTTPStatus.OK)
 
 
 @method_decorator(require_http_methods(["POST"]), name='dispatch')

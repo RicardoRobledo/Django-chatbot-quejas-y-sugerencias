@@ -55,22 +55,29 @@ class GoogleSheetManager():
             (result['Fecha del mensaje'] <= to_date)
         ]
 
-        return tabulate(filtered_result, headers='keys', tablefmt='pipe', showindex=False)
+        markdown_table = tabulate(filtered_result, headers='keys', tablefmt='pipe', showindex=False)
+
+        print(result)
+        print(markdown_table)
+
+        return markdown_table
 
 
 class PromptManager():
 
 
     @classmethod
-    def read_prompt(cls, prompt_file:str):
+    async def read_prompt(cls, prompt_file:str):
         """
         This method read a file and return a prompt template
 
         :param prompt_file: file name to make the prompt
         """
 
-        with open(f'apps/chatbot/prompts/{prompt_file}.txt') as file:
-            file_content = file.read()
+        import aiofiles
+
+        async with aiofiles.open(f'apps/chatbot/prompts/{prompt_file}.txt') as file:
+            file_content = await file.read()
 
         return file_content
 
