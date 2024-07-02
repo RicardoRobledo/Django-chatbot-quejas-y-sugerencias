@@ -16,7 +16,7 @@ function format_chatbot_message(id){
   const chatbotMessage = `
   <div class='chatbot-message col-12 py-4 d-flex justify-content-center' id='${id}' style='display:none;'>
       <div class='d-flex col-8' id='chatbot-message-content'>
-          <img src='/static/imgs/chatbot.png' width='60' height='60'>
+          <img src='/static/imgs/chatbot.jpeg' width='60' height='60'>
           <div class='m-2'>
               <h6>${assistant_name}</h6>
               <p></p>

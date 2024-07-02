@@ -98,7 +98,7 @@ form p{
     text-align: center;
 }
 form p img{
-    content: url("/static/imgs/admin.png");
+    content: url("/static/imgs/login-icon.jpeg");
 }
 label{
     display: block;

@@ -7,7 +7,10 @@ $('#login').on('click', async function(event){
 
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    const response = await fetch('https://django-chatbot-quejas-y-sugerencias.onrender.com/authentication/login/', {
+    //const url = 'http://127.0.0.1:8000/';
+    const url = 'https://django-chatbot-quejas-y-sugerencias.onrender.com/';
+
+    const response = await fetch(url+'authentication/login/', {
         method: 'POST',
         mode: 'same-origin',
         headers: {
