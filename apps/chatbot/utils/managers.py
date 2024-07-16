@@ -2,7 +2,6 @@ from string import Template
 from datetime import datetime
 
 import pandas as pd
-from tabulate import tabulate
 
 from django.conf import settings
 
@@ -45,7 +44,7 @@ class GoogleSheetManager():
         """
 
         result = await cls.read_google_sheets()
-        result['Fecha del mensaje'] = result['Fecha del mensaje'].dt.normalize()
+        result['Fecha del mensaje'] = result['Fecha del mensaje']
 
         from_date = normalize_date(dates['from_date'])
         to_date = normalize_date(dates['to_date'])
@@ -53,14 +52,15 @@ class GoogleSheetManager():
         filtered_result = result[
             (result['Fecha del mensaje'] >= from_date) &
             (result['Fecha del mensaje'] <= to_date)
-        ]
+        ].copy()
 
-        markdown_table = tabulate(filtered_result, headers='keys', tablefmt='pipe', showindex=False)
+        # No empezar diciendo que se genere una grafica directamente, sino posteriormente de que se haya preguntado algo 
+        filtered_result['Fecha del mensaje'] = filtered_result['Fecha del mensaje'].astype(str)
 
-        print(result)
-        print(markdown_table)
+        json_data = filtered_result.to_json(orient='records', lines=True, force_ascii=False)
+        print(json_data)
 
-        return markdown_table
+        return json_data
 
 
 class PromptManager():

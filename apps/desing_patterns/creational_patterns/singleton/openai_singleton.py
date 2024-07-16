@@ -2,7 +2,7 @@ import time
 import base64
 
 from django.conf import settings
-from rest_framework import status
+from http import HTTPStatus
 from openai import AsyncOpenAI
 #from openai.types.beta.threads import ImageFileContentBlock, TextContentBlock
 
@@ -83,13 +83,17 @@ class OpenAISingleton():
             thread_id=thread_id,
             assistant_id=settings.ASSISTANT_ID
         )
-
+        
+        i = 0
         while run.status == "queued" or run.status == "in_progress":
 
             run = await cls.__client.beta.threads.runs.retrieve(
                 thread_id=thread_id,
                 run_id=run.id,
             )
+
+            print(f'{run.status} - {i}')
+            i+=1
 
             time.sleep(0.1)
 
@@ -106,12 +110,12 @@ class OpenAISingleton():
         This method return the answer from the assistant
         """
 
-        message = {'data':{}, 'status_code':status.HTTP_200_OK}
+        message = {'data':{}, 'status_code':HTTPStatus.OK}
 
         if run.status=='failed' and run.last_error.code=='rate_limit_exceeded':
 
             message['data'] = {'msg':'Error, el límite de cuota ha sido alcanzado, por favor verifique su crédito', 'error':'rate_limit_exceeded'}
-            message['status_code'] = status.HTTP_402_PAYMENT_REQUIRED
+            message['status_code'] = HTTPStatus.PAYMENT_REQUIRED
 
             return message
 

@@ -18,18 +18,12 @@ async def send_message(thread_id:str, message:str):
 
 async def send_date_range(thread_id:str, dates:dict):
 
-    # Getting table from google sheets in markdown format
-    markdown_table = await GoogleSheetManager.convert_table_from_dates(dates)
+    # Getting table from google sheets in json format
+    json_table = await GoogleSheetManager.convert_table_from_dates(dates)
 
     # Making prompt
     prompt = await PromptManager.read_prompt('prompt_table')
-    prompt_result = PromptManager.fill_out_prompt(prompt, {'markdown_table':markdown_table})
-
-    print(prompt)
-    print('-------------------')
-    print(prompt_result)
-    print('-------------------')
-    print(markdown_table)
+    prompt_result = PromptManager.fill_out_prompt(prompt, {'json_table':json_table})
 
     # Sending prompt message
     await OpenAISingleton.create_message(thread_id, prompt_result)

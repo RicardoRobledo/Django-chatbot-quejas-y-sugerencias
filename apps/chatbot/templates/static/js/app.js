@@ -1,8 +1,10 @@
-//const url = 'http://127.0.0.1:8000/';
-const url = 'https://django-chatbot-quejas-y-sugerencias.onrender.com/';
+const url = 'http://127.0.0.1:8000/';
+//const url = 'https://django-chatbot-quejas-y-sugerencias.onrender.com/';
 const assistant_name = 'Asistente de quejas';
 const welcome_message = '👋 ¡Hola!, ¿Que necesitas saber el día de hoy?';
-let id_mensaje = 0;
+let message_id = 0;
+let image_id = 0;
+let word_id = 0;
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 const md = window.markdownit();
 
@@ -11,7 +13,7 @@ const md = window.markdownit();
 //                    functions
 // --------------------------------------------------
 
-function format_chatbot_message(id){
+function format_chatbot_message(id) {
 
   const chatbotMessage = `
   <div class='chatbot-message col-12 py-4 d-flex justify-content-center' id='${id}' style='display:none;'>
@@ -36,7 +38,7 @@ function format_chatbot_message(id){
 }
 
 
-function format_user_message(message){
+function format_user_message(message) {
 
   const userMessage = `
   <div class='user-message col-12 py-4 d-flex justify-content-center'>
@@ -54,20 +56,20 @@ function format_user_message(message){
 }
 
 
-function hide_message_container(){
+function hide_message_container() {
   $('#btn-enviar').hide();
   $('#input-message').hide();
 }
 
 
-function disable_form_message(){
+function disable_form_message() {
   $('#btn-detener').show();
   $('#btn-enviar').hide();
   $('#input-message').prop('disabled', true);
 }
 
 
-function enable_form_message(){
+function enable_form_message() {
   let send_button = $('#btn-enviar');
   send_button.css('color', '#000000');
   send_button.css('background-color', '#c5c5c5');
@@ -78,7 +80,7 @@ function enable_form_message(){
 }
 
 
-async function initialize(){
+async function initialize() {
 
   let send_button = $('#btn-enviar');
   send_button.css('background-color', '#c5c5c5');
@@ -91,14 +93,81 @@ async function initialize(){
 }
 
 
-function get_message(){
+async function downloadImage(id) {
+
+  // Obtener la URL de la imagen en base64
+  var imgSrc = $(`#chart-image-${id}`).attr('src');
+
+  // Crear un enlace de descarga
+  var link = $('<a></a>')
+    .attr('href', imgSrc)
+    .attr('download', `imagen-gráfico-${id}.png`)
+    .appendTo('body');
+
+  // Simular el clic en el enlace
+  link[0].click();
+
+  // Eliminar el enlace después de la descarga
+  link.remove();
+
+};
+
+
+async function downloadWord(id) {
+
+  const { Document, Packer, Table, TableRow, TableCell, WidthType, Paragraph } = docx;
+
+  const table = $(`#word-table-${id} table`)[0];
+
+  function createWordTable(htmlTable) {
+    const rows = $(htmlTable).find('tr').get();
+    const docxRows = rows.map(row => {
+      const cells = $(row).find('th, td').get();
+      const docxCells = cells.map(cell => new TableCell({
+        children: [new Paragraph($(cell).text())],
+      }));
+      return new TableRow({
+        children: docxCells,
+      });
+    });
+
+    return new Table({
+      rows: docxRows,
+      width: {
+        size: 100,
+        type: WidthType.PERCENTAGE,
+      },
+    });
+  }
+
+  const docTable = createWordTable(table);
+
+  const doc = new Document({
+    sections: [{
+      children: [docTable],
+    }],
+  });
+
+  // Empaquetar el documento para ser descargado
+  Packer.toBlob(doc).then(blob => {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `documento-word-${id}.docx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
+};
+
+function get_message() {
   const message = $('#input-message').val();
   $('#input-message').val('');
   return message;
 }
 
 
-async function send_message(id, user_message, signal){
+async function send_message(id, user_message, signal) {
 
   const message_url = url + 'chatbot/message/';
   const thread_id = localStorage.getItem('thread_id');
@@ -111,12 +180,12 @@ async function send_message(id, user_message, signal){
       'X-CSRFToken': csrftoken,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({thread_id, user_message})
+    body: JSON.stringify({ thread_id, user_message })
   }).then(async (response) => {
 
-    if(response.status===402){
+    if (response.status === 402) {
       throw new PaymentRequiredError('Error, se ha alcanzado alcanzado el límite de saldo');
-    }else{
+    } else {
       return response.json();
     }
 
@@ -125,26 +194,31 @@ async function send_message(id, user_message, signal){
 
       const msg = data['msg'];
       let resultHtml = '';
-      
+
       const parser = new DOMParser();
       const doc = parser.parseFromString(msg, 'text/html');
 
-      if('img' in data){
+      if ('img' in data) {
 
         resultHtml = md.render(msg);
         $(`#${id} .m-2`).append(resultHtml);
-        $(`#${id} .m-2`).append(`<img src="data:image/png;base64,${data['img']}" class="img-fluid">`);
+        $(`#${id} .m-2`).append(`
+          <div class="text-center">
+            <img src="data:image/png;base64,${data['img']}" class="img-fluid" id="chart-image-${image_id}">
+            <button id="download-image" class="btn btn-info text-white mt-5" onclick="downloadImage(${image_id++})">Descargar imagen</button>
+          </div>`);
 
-      }else if (Array.from(doc.body.childNodes).some(node => node.nodeType === 1)) {
+      } else if (Array.from(doc.body.childNodes).some(node => node.nodeType === 1)) {
 
         const table = `
         <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header d-flex justify-content-between">
       <p class="fw-semibold">Tabla generada</p>
+      <button id="downloadPdf" class="btn btn-info text-white mt-3" onclick="downloadWord(${image_id})">Descargar Word</button>
     </div>
     <div class="card-body">
       <div class="container">
-        <div class="table-responsive">
+        <div class="table-responsive" id="word-table-${word_id++}">
           ${doc.body.innerHTML}
         </div>
       </div>
@@ -155,50 +229,50 @@ async function send_message(id, user_message, signal){
         $('table').addClass('table table-warning table-bordered table-hover');
         $(`#${id} #chatbot-message-content`).addClass('flex-column');
 
-      }else{
-      
+      } else {
+
         resultHtml = md.render(msg);
         $(`#${id} .m-2 p`).append(resultHtml);
-      
+
       }
 
     }
   ).catch(error => {
 
-    if (error.name==='AbortError') {
+    if (error.name === 'AbortError') {
       $(`#${id} .m-2 p`).append('<h7 class="text-secondary">Mensaje detenido<h7>');
-    } else if(error.name==='PaymentRequiredError'){
+    } else if (error.name === 'PaymentRequiredError') {
       $(`#${id} .m-2 p`).append('<h7 class="text-danger">Error, el límite de cuota ha sido alcanzado, por favor verifique su crédito<h7>');
-    }else {
+    } else {
       $(`#${id} .m-2 p`).append('<h7 class="text-danger">Hubo un error en el mensaje<h7>');
     }
-  
+
   });
 
   return response;
 }
 
 
-async function create_conversation_thread(fromDate, toDate){
+async function create_conversation_thread(fromDate, toDate) {
 
-  const response = await fetch(url+'chatbot/thread_id/', {
-    
+  const response = await fetch(url + 'chatbot/thread_id/', {
+
     method: 'POST',
     mode: 'same-origin',
     headers: {
       'X-CSRFToken': csrftoken,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({'dates':{'from_date':fromDate, 'to_date':toDate}})
+    body: JSON.stringify({ 'dates': { 'from_date': fromDate, 'to_date': toDate } })
 
   }).then(async (response) => {
 
-    if(response.status===200){
+    if (response.status === 200) {
       return response.json();
     }
 
-  }).then(async (data)=>{
-    
+  }).then(async (data) => {
+
     $('#btn-enviar').fadeIn(900)
     $('#input-message').show(900);
     $('#form-calendar').hide();
@@ -208,7 +282,7 @@ async function create_conversation_thread(fromDate, toDate){
     $('#initial-cards-container').fadeIn(900);
 
     return data;
-  
+
   });
 
   localStorage.setItem('thread_id', response['thread_id']);
@@ -216,9 +290,9 @@ async function create_conversation_thread(fromDate, toDate){
 }
 
 
-async function delete_conversation_thread(){
+async function delete_conversation_thread() {
 
-  if(localStorage.getItem('thread_id')!==null){
+  if (localStorage.getItem('thread_id') !== null) {
 
     var requestOptions = {
       method: 'POST',
@@ -228,14 +302,14 @@ async function delete_conversation_thread(){
         'Content-Type': 'application/json',
       }
     };
-  
-    const thread_url = url+'chatbot/thread_id/'+localStorage.getItem('thread_id')+'/'
+
+    const thread_url = url + 'chatbot/thread_id/' + localStorage.getItem('thread_id') + '/'
     navigator.sendBeacon(thread_url, requestOptions);
-  
+
     localStorage.removeItem('thread_id');
 
   }
-	
+
 }
 
 
@@ -244,7 +318,7 @@ async function delete_conversation_thread(){
 // --------------------------------------------------
 
 
-$('.initial-message-container').on('click', function() {
+$('.initial-message-container').on('click', function () {
   const text = $(this).find('.card-text').text();
   $('#initial-cards-container').hide();
   enable_form_message();
@@ -254,16 +328,16 @@ $('.initial-message-container').on('click', function() {
 });
 
 
-$('#input-message').on('keyup', function(event){
+$('#input-message').on('keyup', function (event) {
 
   let text = $(this).val();
   let button = $('#btn-enviar');
 
-  if(text.trim() === ""){
+  if (text.trim() === "") {
     button.css('color', '#000000');
     button.css('background-color', '#c5c5c5');
     button.prop('disabled', true);
-  }else{
+  } else {
     if (event.keyCode === 13) {
       button.trigger('click');
     }
@@ -276,7 +350,7 @@ $('#input-message').on('keyup', function(event){
 });
 
 
-$('#confirm-button').click(async function(event) {
+$('#confirm-button').click(async function (event) {
 
   event.preventDefault();
 
@@ -288,29 +362,29 @@ $('#confirm-button').click(async function(event) {
   const toDate = new Date($('#datepicker2').val());
 
   if (!isValidDate(fromDate) || !isValidDate(toDate)) {
-    
+
     $('#warning-badge').text('Una o ambas fechas son inválidas');
-    $('#warning-badge').fadeIn(900, function(){
+    $('#warning-badge').fadeIn(900, function () {
       $(this).delay(2000).fadeOut(900);
     });
-  
-  }else if(fromDate>toDate){
-  
+
+  } else if (fromDate > toDate) {
+
     $('#warning-badge').text('La fecha inicial no puede ser mayor a la fecha final');
-    $('#warning-badge').fadeIn(900, function(){
+    $('#warning-badge').fadeIn(900, function () {
       $(this).delay(2000).fadeOut(900);
     });
-  
-  }else{
-  
+
+  } else {
+
     await create_conversation_thread(fromDate, toDate);
-  
+
   }
 
 });
 
 
-$('#btn-logout').click(async function(event) {
+$('#btn-logout').click(async function (event) {
 
   await delete_conversation_thread();
   window.location.href = '/authentication/login/';
@@ -318,13 +392,13 @@ $('#btn-logout').click(async function(event) {
 });
 
 
-$('#btn-enviar').on('click', async function(){
+$('#btn-enviar').on('click', async function () {
 
   $('#initial-cards-container').hide();
   disable_form_message();
   const userMessage = get_message();
   // getting identifier to add in chatbot message
-  const id = 'container-chatbot-message-'+id_mensaje++;
+  const id = 'container-chatbot-message-' + message_id++;
   const formattedChatbotMessage = format_chatbot_message(id);
   const formattedUserMessage = format_user_message(userMessage);
 
@@ -349,7 +423,7 @@ $('#btn-enviar').on('click', async function(){
 });
 
 
-$('#btn-detener').on('click', function(){
+$('#btn-detener').on('click', function () {
   enable_form_message();
   if (controller) {
     controller.abort(); // Se llama al método abort() del controlador para cancelar la petición
@@ -358,9 +432,9 @@ $('#btn-detener').on('click', function(){
 });
 
 
-$(window).on('beforeunload', async function() {
+$(window).on('beforeunload', async function () {
 
-  if(localStorage.getItem('thread_id')!==null){
+  if (localStorage.getItem('thread_id') !== null) {
     await delete_conversation_thread();
   }
 
@@ -374,15 +448,15 @@ $(window).on('beforeunload', async function() {
 
 class CustomError extends Error {
   constructor(name, message) {
-      super(message);
-      this.name = name;
+    super(message);
+    this.name = name;
   }
 }
 
 // Otra clase de error personalizada
 class PaymentRequiredError extends CustomError {
   constructor(message) {
-      super('PaymentRequiredError', message);
+    super('PaymentRequiredError', message);
   }
 }
 
@@ -391,13 +465,13 @@ class PaymentRequiredError extends CustomError {
 // --------------------------------------------------
 
 
-$(document).ready(async function() {
+$(document).ready(async function () {
 
   await initialize();
 
   $("h6").text(`{{assistant_name}}`.replace("{{assistant_name}}", assistant_name));
 
-  $(".loader-wrapper").fadeOut(1200, function() {
+  $(".loader-wrapper").fadeOut(1200, function () {
     $("#contenido").fadeIn(1500);
   });
 
