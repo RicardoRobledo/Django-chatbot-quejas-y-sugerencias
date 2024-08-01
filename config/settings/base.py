@@ -34,6 +34,7 @@ APPS = [
 THIRD_APPS = [
     'rest_framework',
     'adrf',
+    'corsheaders',
 ]
 
 DJANGO_APPS = [
@@ -45,9 +46,11 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 
+
 INSTALLED_APPS = APPS + THIRD_APPS + DJANGO_APPS
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -133,17 +136,17 @@ AUTH_USER_MODEL = 'users.UserModel'
 
 
 # ------------------- Openai ----------------------
-OPENAI_API_KEY=config('OPENAI_API_KEY')
-ASSISTANT_MODEL=config('ASSISTANT_MODEL')
-ASSISTANT_ID=config('ASSISTANT_ID')
+OPENAI_API_KEY = config('OPENAI_API_KEY')
+ASSISTANT_MODEL = config('ASSISTANT_MODEL')
+ASSISTANT_ID = config('ASSISTANT_ID')
 # -------------------------------------------------
 
 # ---------------- Google sheets ------------------
-GOOGLE_SHEET_ID=config('GOOGLE_SHEET_ID')
+GOOGLE_SHEET_ID = config('GOOGLE_SHEET_ID')
 # -------------------------------------------------
 
 # ------------------- Base url --------------------
-BASE_URL_APP=config('BASE_URL_APP')
+BASE_URL_APP = config('BASE_URL_APP')
 # -------------------------------------------------
 
 
