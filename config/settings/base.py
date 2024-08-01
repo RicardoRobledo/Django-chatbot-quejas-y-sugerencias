@@ -139,6 +139,7 @@ AUTH_USER_MODEL = 'users.UserModel'
 OPENAI_API_KEY = config('OPENAI_API_KEY')
 ASSISTANT_MODEL = config('ASSISTANT_MODEL')
 ASSISTANT_ID = config('ASSISTANT_ID')
+MAX_TOKENS_CODE_INTERPRETER = config('MAX_TOKENS_CODE_INTERPRETER')
 # -------------------------------------------------
 
 # ---------------- Google sheets ------------------

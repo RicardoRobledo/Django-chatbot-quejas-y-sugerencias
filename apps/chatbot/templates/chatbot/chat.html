@@ -27,6 +27,29 @@
     </div>
 
     <div id="contenido" style="display:none;">
+
+        <div class="modal fade" id="ThreadErrorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title text-danger fw-bold" id="exampleModalLabel">Error</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <p>El hilo de conversación no ha podido ser creado, esto puede ser debido al alto tráfico en los servidores de OpenAI, para solucionarlo puedes hacer lo siguiente:</p>
+                  <br>
+                  <ul>
+                    <li>Recargar la página.</li>
+                    <li>Cerrar sesión y volver a iniciar sesión.</li>
+                    <li>Cerrar el navegador y volver a iniciar sesión.</li>
+                  </ul>
+                  <br>
+                  <p>Si el problema persiste comuníquese con soporte técnico.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
         <nav class="navbar navbar-expand-lg sticky-top">
             <div class="container">
                 <div class="">
@@ -77,7 +100,9 @@
                                 id="warning-badge"></span>
                         </p>
                         <span class="badge text-bg-success" style="font-size:0.8rem; display:none;"
-                            id="success-badge">Éxito</span>
+                            id="success-date-badge">Éxito</span>
+                        <span class="badge" style="font-size:0.8rem; display:none;"
+                            id="success-tokens-badge"></span>
                     </div>
                 </div>
             </div>
@@ -122,7 +147,7 @@
                     </div>
                 </div>
             </div>
-            <div class="input-message-container col-6 d-flex justify-content-center">
+            <div class="input-message-container col-md-6 d-flex justify-content-center">
                 <input type="text" class="form-control p-2" id="input-message" placeholder="Escribe aquí..."
                     maxlength="400" required>
                 <button class="px-3" id="btn-enviar" type="submit" disabled>Enviar</button>

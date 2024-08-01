@@ -10,7 +10,7 @@ __author__ = 'Ricardo Robledo'
 __version__ = '1.0'
 
 
-def normalize_date(date:str):
+def normalize_date(date: str):
 
     date_string = date.replace('Z', '+00:00')
     date = datetime.fromisoformat(date_string)
@@ -21,21 +21,21 @@ def normalize_date(date:str):
 
 class GoogleSheetManager():
 
-
     @classmethod
     async def read_google_sheets(cls):
         """
         This method read the google sheet and return the a string representation of the data.
         """
 
-        df = pd.read_csv(f'https://docs.google.com/spreadsheets/d/{settings.GOOGLE_SHEET_ID}/export?format=csv')
-        df['Fecha del mensaje'] = pd.to_datetime(df['Fecha del mensaje'], format='%d/%m/%Y %H:%M:%S')
+        df = pd.read_csv(
+            f'https://docs.google.com/spreadsheets/d/{settings.GOOGLE_SHEET_ID}/export?format=csv')
+        df['Fecha del mensaje'] = pd.to_datetime(
+            df['Fecha del mensaje'], format='%d/%m/%Y %H:%M:%S').dt.date
 
         return df
 
-
     @classmethod
-    async def convert_table_from_dates(cls, dates:dict):
+    async def convert_table_from_dates(cls, dates: dict):
         """
         This method build a markdown table from a pandas dataframe given a date range.
 
@@ -44,30 +44,31 @@ class GoogleSheetManager():
         """
 
         result = await cls.read_google_sheets()
-        result['Fecha del mensaje'] = result['Fecha del mensaje']
 
-        from_date = normalize_date(dates['from_date'])
-        to_date = normalize_date(dates['to_date'])
+        from_date = pd.to_datetime(dates['from_date']).date()
+        to_date = pd.to_datetime(dates['to_date']).date()
 
         filtered_result = result[
             (result['Fecha del mensaje'] >= from_date) &
             (result['Fecha del mensaje'] <= to_date)
         ].copy()
 
-        # No empezar diciendo que se genere una grafica directamente, sino posteriormente de que se haya preguntado algo 
-        filtered_result['Fecha del mensaje'] = filtered_result['Fecha del mensaje'].astype(str)
+        print(f'Number of filtered rows: {filtered_result.shape[0]}')
 
-        json_data = filtered_result.to_json(orient='records', lines=True, force_ascii=False)
-        print(json_data)
+        # No empezar diciendo que se genere una grafica directamente, sino posteriormente de que se haya preguntado algo
+        filtered_result['Fecha del mensaje'] = filtered_result['Fecha del mensaje'].astype(
+            str)
+
+        json_data = filtered_result.to_json(
+            orient='records', lines=True, force_ascii=False)
 
         return json_data
 
 
 class PromptManager():
 
-
     @classmethod
-    async def read_prompt(cls, prompt_file:str):
+    async def read_prompt(cls, prompt_file: str):
         """
         This method read a file and return a prompt template
 
@@ -81,9 +82,8 @@ class PromptManager():
 
         return file_content
 
-
     @classmethod
-    def fill_out_prompt(cls, prompt:str, variables:dict):
+    def fill_out_prompt(cls, prompt: str, variables: dict):
         """
         This method fill out a prompt template
 

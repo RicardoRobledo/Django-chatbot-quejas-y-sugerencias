@@ -23,7 +23,7 @@ class SendMessageView(View):
         body = json.loads(request.body)
         thread_id = body.get('thread_id')
         user_message = body.get('user_message')
-        
+
         response = await chatbot_repository.send_message(thread_id, user_message)
         return JsonResponse(data=response['data'], status=response['status_code'])
 
@@ -32,20 +32,20 @@ class SendMessageView(View):
 class CreateThreadView(View):
 
     async def post(self, request, *args, **kwargs):
-        
+
         body = json.loads(request.body)
         dates = body.get('dates')
 
-        thread_id =  await OpenAISingleton.create_thread()
+        thread_id = await OpenAISingleton.create_thread()
         print(thread_id)
 
-        await chatbot_repository.send_date_range(thread_id.id, dates)
-        return JsonResponse(data={'thread_id':thread_id.id}, status=HTTPStatus.OK)
+        num_tokens = await chatbot_repository.send_date_range(thread_id.id, dates)
+        return JsonResponse(data={'thread_id': thread_id.id, 'num_tokens': num_tokens}, status=HTTPStatus.OK)
 
 
 @method_decorator(require_http_methods(["POST"]), name='dispatch')
 class DeleteThreadView(View):
-    
+
     async def post(self, request, thread_id, *args, **kwargs):
         await OpenAISingleton.delete_thread(thread_id)
         return JsonResponse({})
@@ -59,5 +59,5 @@ class ChatView(View):
         """
         This method return our chatbot view
         """
-        
+
         return TemplateResponse(request, 'chatbot/chat.html')

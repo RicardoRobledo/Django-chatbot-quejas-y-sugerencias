@@ -1,5 +1,5 @@
-//const url = 'http://127.0.0.1:8000/';
-const url = 'https://django-chatbot-quejas-y-sugerencias.onrender.com/';
+const url = 'http://127.0.0.1:8000/';
+//const url = 'https://django-chatbot-quejas-y-sugerencias.onrender.com/';
 const assistant_name = 'Asistente de quejas';
 const welcome_message = '👋 ¡Hola!, ¿Que necesitas saber el día de hoy?';
 let message_id = 0;
@@ -269,6 +269,8 @@ async function create_conversation_thread(fromDate, toDate) {
 
     if (response.status === 200) {
       return response.json();
+    }else if (response.status === 500) {
+      throw new CustomError('ThreadError', 'Error al crear el hilo de conversación');
     }
 
   }).then(async (data) => {
@@ -278,14 +280,32 @@ async function create_conversation_thread(fromDate, toDate) {
     $('#form-calendar').hide();
     $('#message-container p').remove();
     $('#message-container form').remove();
-    $('#success-badge').fadeIn(900);
+    $('#success-tokens-badge').fadeIn(900);
+    $('#success-date-badge').fadeIn(900);
     $('#initial-cards-container').fadeIn(900);
+
+    const num_tokens = data['num_tokens'];
+
+    if(num_tokens<=2906){
+      $('#success-tokens-badge').text(`Tokens: ${num_tokens}`);
+      $('#success-tokens-badge').addClass('text-bg-primary');
+    }else{
+      $('#success-tokens-badge').text(`Tokens: ${num_tokens}`);
+      $('#success-tokens-badge').addClass('text-bg-danger');
+    }
+
+    localStorage.setItem('num_token', num_tokens);
+    localStorage.setItem('thread_id', data['thread_id']);
 
     return data;
 
-  });
+  }).catch(error => {
 
-  localStorage.setItem('thread_id', response['thread_id']);
+    if (error.name === 'ThreadError') {
+      $('#ThreadErrorModal').modal('show');
+    } 
+
+  });
 
 }
 
