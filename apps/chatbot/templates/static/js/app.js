@@ -269,7 +269,8 @@ async function create_conversation_thread(fromDate, toDate) {
 
     if (response.status === 200) {
       return response.json();
-    }else if (response.status === 500 || response.status === 502) {
+    }else if (response.status === 500 || response.status === 502 || response.status === 404) {
+      console.log(response.status);
       throw new CustomError('ThreadError', 'Error al crear el hilo de conversación');
     }
 
