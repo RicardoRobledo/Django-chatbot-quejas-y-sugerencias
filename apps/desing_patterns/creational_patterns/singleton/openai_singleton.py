@@ -1,10 +1,13 @@
 import time
 import base64
+import asyncio
 
 from django.conf import settings
 from http import HTTPStatus
 from openai import AsyncOpenAI
 # from openai.types.beta.threads import ImageFileContentBlock, TextContentBlock
+from apps.base.schemas.openai_schemas import Complaints, Suggestions
+from apps.base.utils.managers import GraphManager, GoogleSheetManager
 
 
 __author__ = 'Ricardo'
@@ -64,7 +67,7 @@ class OpenAISingleton():
         message = {'data': {}, 'status_code': HTTPStatus.OK}
 
         response = await cls.__client.chat.completions.create(
-            model=settings.ASSISTANT_MODEL,
+            model=settings.OPENAI_MODEL,
             messages=[
                 {"role": "system",
                     "content": "Eres un asistente de AI experto en detectar intenciones de usuarios, debes de verificar si el siguiente mensaje tiene la intención de crar una gráfica, debes responder (Sí/No)"},
@@ -76,6 +79,124 @@ class OpenAISingleton():
         response_message = response.choices[0].message.content
 
         return response_message
+
+    @classmethod
+    async def create_full_completion_admin(cls, prompt_complaints: str, prompt_suggestions: str):
+        """
+        This method create a new completion message taking full data
+
+        :param prompt_complaints: a string being our prompt for complaints
+        :param prompt_suggestions: a string being our prompt for suggestions
+        :return: a completion message
+        """
+
+        message = {'data': {}, 'status_code': HTTPStatus.OK}
+
+        system_message = "Eres un asistente de ia avanzada que ayuda en un departamento de recursos humanos clasificando quejas y sugerencias y dando porcentajes sobre que tan importantes son cierto tipo de quejas"
+
+        completion_complaints = cls.__client.beta.chat.completions.parse(
+            model=settings.OPENAI_MODEL,
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": prompt_complaints},
+            ],
+            response_format=Complaints,
+        )
+
+        completion_suggestions = cls.__client.beta.chat.completions.parse(
+            model=settings.OPENAI_MODEL,
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": prompt_suggestions},
+            ],
+            response_format=Suggestions,
+        )
+
+        completion_complaints, completion_suggestions = await asyncio.gather(
+            completion_complaints, completion_suggestions
+        )
+
+        # Getting complaints data
+        complaints_response = completion_complaints.choices[0].message.parsed
+        complaints = complaints_response.complaints
+        complaints_percentages = complaints_response.percentages
+
+        # Getting suggestions data
+        suggestions_response = completion_suggestions.choices[0].message.parsed
+        suggestions = suggestions_response.suggestions
+        suggestions_percentages = suggestions_response.percentages
+
+        # Getting number of complaints and suggestions by month
+        number_complaints_suggestions_by_month = await GoogleSheetManager.get_number_complaints_suggestions_by_month()
+
+        # Making graphs
+        complaints_graph = GraphManager.create_graph('Quejas',
+                                                     complaints, complaints_percentages)
+        suggestion_graph = GraphManager.create_graph('Sugerencias',
+                                                     suggestions, suggestions_percentages)
+
+        message['data'] = {'number_complaints_suggestions_by_month': number_complaints_suggestions_by_month,
+                           'complaints_response': {'complaints': complaints, 'percentages': complaints_percentages, 'graph': complaints_graph},
+                           'suggestions_response': {'suggestions': suggestions, 'percentages': suggestions_percentages, 'graph': suggestion_graph}}
+
+        return message
+
+    @classmethod
+    async def create_month_completion_admin(cls, prompt_complaints: str, prompt_suggestions: str):
+        """
+        This method create a new completion message taking full data
+
+        :param prompt_complaints: a string being our prompt for complaints
+        :param prompt_suggestions: a string being our prompt for suggestions
+        :return: a completion message
+        """
+
+        message = {'data': {}, 'status_code': HTTPStatus.OK}
+
+        system_message = "Eres un asistente de ia avanzada que ayuda en un departamento de recursos humanos clasificando quejas y sugerencias y dando porcentajes sobre que tan importantes son cierto tipo de quejas"
+
+        completion_complaints = cls.__client.beta.chat.completions.parse(
+            model=settings.OPENAI_MODEL,
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": prompt_complaints},
+            ],
+            response_format=Complaints,
+        )
+
+        completion_suggestions = cls.__client.beta.chat.completions.parse(
+            model=settings.OPENAI_MODEL,
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": prompt_suggestions},
+            ],
+            response_format=Suggestions,
+        )
+
+        completion_complaints, completion_suggestions = await asyncio.gather(
+            completion_complaints, completion_suggestions
+        )
+
+        # Getting complaints data
+        complaints_response = completion_complaints.choices[0].message.parsed
+        complaints = complaints_response.complaints
+        complaints_percentages = complaints_response.percentages
+
+        # Getting suggestions data
+        suggestions_response = completion_suggestions.choices[0].message.parsed
+        suggestions = suggestions_response.suggestions
+        suggestions_percentages = suggestions_response.percentages
+
+        # Making graphs
+        complaints_graph = GraphManager.create_graph('Quejas',
+                                                     complaints, complaints_percentages)
+        suggestion_graph = GraphManager.create_graph('Sugerencias',
+                                                     suggestions, suggestions_percentages)
+
+        message['data'] = {'complaints_response': {'complaints': complaints, 'percentages': complaints_percentages, 'graph': complaints_graph},
+                           'suggestions_response': {'suggestions': suggestions, 'percentages': suggestions_percentages, 'graph': suggestion_graph}}
+
+        return message
 
     @classmethod
     async def create_message(cls, thread_id: str, message: str):

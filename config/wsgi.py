@@ -11,7 +11,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.production')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
 
 
 def startup():
@@ -19,8 +19,18 @@ def startup():
     This method initialize our connection and services
     """
 
+    print('Configuring services...')
+
     from apps.desing_patterns.creational_patterns.singleton.openai_singleton import OpenAISingleton
+
+    print('Initializing OpenAISingleton...')
     print(OpenAISingleton())
+    print('OpenAISingleton initialized!')
+
+    print('Configuring matplotlib...')
+    import matplotlib
+    matplotlib.use('Agg')
+    print('matplotlib configured!')
 
 
 startup()

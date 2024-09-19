@@ -22,8 +22,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('authentication/', include('apps.authentication.urls', namespace='authentication_app')),
-    path('chatbot/', include('apps.chatbot.controllers.urls', namespace='chatbot_app'))
+    path('custom_admin/', include('apps.base.controllers.urls',
+         namespace='base_app')),
+    path('authentication/', include('apps.authentication.urls',
+         namespace='authentication_app')),
+    path('chatbot/', include('apps.chatbot.controllers.urls', namespace='chatbot_app')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 handler404 = 'apps.authentication.views.custom_404'

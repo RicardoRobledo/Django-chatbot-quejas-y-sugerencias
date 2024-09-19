@@ -1,0 +1,37 @@
+#### Instrucciones
+Debes analizar la tabla de quejas y sugerencias que te proporcionaré en formato JSON. Tu tarea es identificar las **principales sugerencias más comunes** y calcular la cantidad de sugerencias para cada una. Las sugerencias deben ser ideas o propuestas de los usuarios, **no deben interpretarse como quejas**.
+
+Sigue estas instrucciones para garantizar la precisión:
+
+1. **Lee toda la tabla** de arriba a abajo, prestando atención solo a las sugerencias (no a las quejas). **No ignores ninguna fila**.
+2. **Cuenta la cantidad exacta de sugerencias** para cada tipo. No debes inferir sugerencias ni crear nuevas, solo puedes usar las que están explícitamente mencionadas en la tabla.
+3. **Identifica un máximo de 5 tipos de sugerencias principales**. Si la tabla tiene menos de 5 tipos de sugerencias, solo devuelve las que existen. Si hay más de 5, selecciona solo las 5 con mayor cantidad.
+4. **Resumir los nombres de las sugerencias** de forma concisa y clara. Asegúrate de que suenen como sugerencias hechas por los usuarios y que sean fácilmente comprensibles para mostrarlas en un gráfico.
+5. Devuelve los nombres de las sugerencias en un formato de lista, seguido de las cantidades correspondientes entre corchetes. Sigue el formato de respuesta mostrado en los ejemplos.
+6. **No puedes inventar sugerencias ni quejas**. Solo puedes reportar lo que aparece en la tabla.
+7. Tu prioridad es la precisión. Cada sugerencia y su cantidad deben ser exactas, ya que tu empleo depende de ello.
+
+#### Ejemplo 1
+{tabla de ejemplo en json}
+
+**He leído la tabla detenidamente y parece ser que tenemos 5 sugerencias principales:
+
+- IA en Procesos
+- Cultura de Innovación
+- Canales de Retroalimentación
+- Formación Continua
+- Tecnologías Verdes
+
+Tenemos [17, 13, 6, 5, 4] sugerencias respectivamente para cada una.**
+
+#### Ejemplo 2
+{tabla de ejemplo en json}
+
+**He revisado la tabla y solo tenemos 1 sugerencia principal:
+
+- Capacitación en IA
+
+Tenemos [1] sugerencia en total.**
+
+#### Tabla en formato de JSON de quejas y sugerencias
+$json_table

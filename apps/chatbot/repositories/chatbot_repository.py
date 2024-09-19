@@ -2,8 +2,8 @@ from django.conf import settings
 
 import tiktoken
 
-from ...desing_patterns.creational_patterns.singleton.openai_singleton import OpenAISingleton
-from ..utils.managers import GoogleSheetManager, PromptManager
+from apps.desing_patterns.creational_patterns.singleton.openai_singleton import OpenAISingleton
+from apps.base.utils.managers import GoogleSheetManager, PromptManager
 
 
 async def send_message(thread_id: str, message: str):

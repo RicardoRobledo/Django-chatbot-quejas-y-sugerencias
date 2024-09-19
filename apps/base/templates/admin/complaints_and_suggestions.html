@@ -1,0 +1,58 @@
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<head>
+  <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+
+<link rel="stylesheet" href="{% static 'css/complaints_and_suggestions.css' %}">
+
+<!-- Loader -->
+<div class="loader-container">
+  <div class="loader">
+    <div class="loader-bar"></div>
+  </div>
+  <h1 class="loader-text">Cargando información...</h1>
+</div>
+
+<!-- Contenido principal -->
+<div class="content-container">
+  <!-- Título encima de todo -->
+  <h1>Estadísticas de quejas y sugerencias - {% now "Y" %}</h1>
+
+  <!-- Contenedor que agrupa la tabla, el botón y la imagen en el mismo nivel -->
+  <div class="main-content">
+    <!-- Sección izquierda con la tabla y el botón -->
+    <div class="left-section">
+      <table>
+        <thead>
+          <tr>
+            <th>Mes</th>
+            <th>Cantidad de quejas y sugerencias</th>
+            <th>Seleccionar mes a consultar</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+        </tbody>
+      </table>
+
+      <form>
+        {% csrf_token %}
+        <div class="submit-row center-text" style="margin-top: 20px;">
+          <input type="submit" value="Consultar" class="default" id="btn-consult">
+        </div>
+      </form>
+    </div>
+
+    <!-- Sección derecha con las imágenes -->
+    <div class="right-section"></div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="{% static 'js/complaints_and_suggestions.js' %}"></script>
+
+{% endblock %}

@@ -1,5 +1,5 @@
-//const url = 'http://127.0.0.1:8000/';
-const url = 'https://django-chatbot-quejas-y-sugerencias.onrender.com/';
+const url = 'http://127.0.0.1:8000/';
+//const url = 'https://django-chatbot-quejas-y-sugerencias.onrender.com/';
 const assistant_name = 'Asistente de quejas';
 const welcome_message = '👋 ¡Hola!, ¿Que necesitas saber el día de hoy?';
 let message_id = 0;
@@ -87,6 +87,7 @@ async function initialize() {
   send_button.css('color', '#000000');
   send_button.prop('disabled', true);
   $('#btn-detener').hide();
+  $('#btn-volver').hide();
   hide_message_container();
   $('#initial-cards-container').hide();
 
@@ -279,8 +280,8 @@ async function create_conversation_thread(fromDate, toDate) {
     $('#btn-enviar').fadeIn(900)
     $('#input-message').show(900);
     $('#form-calendar').hide();
-    $('#message-container p').remove();
-    $('#message-container form').remove();
+    $('#message-container p').hide();
+    $('#message-container form').hide();
     $('#success-tokens-badge').fadeIn(900);
     $('#success-date-badge').fadeIn(900);
     $('#initial-cards-container').fadeIn(900);
@@ -399,8 +400,25 @@ $('#confirm-button').click(async function (event) {
   } else {
 
     await create_conversation_thread(fromDate, toDate);
+    $('#btn-volver').show();
 
   }
+
+});
+
+
+$('#btn-volver').click(function () {
+
+  $('#message-container p').show();
+  $('#message-container form').show();
+  $('#success-tokens-badge').hide();
+  $('#success-date-badge').hide();
+  $('#initial-cards-container').hide();
+  $('#input-message').val('');
+  $('#btn-enviar').hide();
+  $('#input-message').hide();
+  $('#btn-volver').hide();
+  localStorage.removeItem('thread_id');
 
 });
 

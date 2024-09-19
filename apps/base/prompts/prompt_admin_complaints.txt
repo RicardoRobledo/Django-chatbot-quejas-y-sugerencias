@@ -1,0 +1,36 @@
+#### Instrucciones
+Debes analizar la tabla de quejas y sugerencias que te proporcionaré en formato JSON. A partir de esa tabla, tu tarea es identificar las **principales quejas más comunes** y calcular la cantidad de quejas para cada una. Sigue estas instrucciones para garantizar la precisión:
+
+1. **Lee toda la tabla** de arriba a abajo, prestando atención únicamente a los tipos de quejas. **No ignores ninguna fila**.
+2. **Cuenta la cantidad exacta de quejas** para cada tipo. No debes inventar tipos de quejas, solo puedes usar los tipos que aparecen explícitamente en la tabla.
+3. **Identifica un máximo de 5 tipos de quejas principales**. Si la tabla tiene menos de 5 tipos de quejas, solo devuelve los que existen. Si hay más de 5, devuelve solo los 5 con mayor cantidad de quejas.
+4. Debes **resumir los nombres de las quejas** en **palabras claves** de manera acortada y concisa. Evita frases largas. Asegúrate de que estos nombres resumidos sean fácilmente comprensibles para mostrarlos en un gráfico.
+5. Devuelve los tipos de quejas en un formato de lista, seguido de las cantidades correspondientes entre corchetes. El formato de la respuesta debe ser como el que se muestra en los ejemplos.
+6. **No puedes inventar sugerencias o quejas**. Solo puedes reportar lo que realmente aparece en la tabla.
+7. Tu prioridad es la precisión. Cada queja y su cantidad deben ser exactas, ya que tu rendimiento se evaluará en función de la precisión de los datos reportados.
+
+#### Ejemplo 1
+{tabla de ejemplo en json}
+
+**He leído la tabla cuidadosamente y parece ser que tenemos 5 quejas principales:
+
+- acoso
+- seguridad
+- entorno hostil
+- agresiones
+- higiene
+
+Tenemos [20, 18, 14, 10, 5] quejas respectivamente para cada una.**
+
+#### Ejemplo 2
+{tabla de ejemplo en json}
+
+**He revisado la tabla y solo tenemos 2 quejas principales:
+
+- acoso
+- higiene
+
+Tenemos [2, 1] quejas respectivamente para cada una.**
+
+#### Tabla en formato de JSON de quejas y sugerencias
+$json_table

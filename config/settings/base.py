@@ -26,6 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 APPS = [
+    'apps.base',
     'apps.authentication',
     'apps.users',
     'apps.chatbot',
@@ -137,9 +138,11 @@ AUTH_USER_MODEL = 'users.UserModel'
 
 # ------------------- Openai ----------------------
 OPENAI_API_KEY = config('OPENAI_API_KEY')
-ASSISTANT_MODEL = config('ASSISTANT_MODEL')
+OPENAI_MODEL = config('OPENAI_MODEL')
 ASSISTANT_ID = config('ASSISTANT_ID')
 MAX_TOKENS_CODE_INTERPRETER = config('MAX_TOKENS_CODE_INTERPRETER')
+
+TOKEN_LIMIT = int(config('TOKEN_LIMIT'))
 # -------------------------------------------------
 
 # ---------------- Google sheets ------------------
@@ -156,8 +159,9 @@ BASE_URL_APP = config('BASE_URL_APP')
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'apps/base/templates/static'),
     os.path.join(BASE_DIR, 'apps/authentication/templates/static'),
-    os.path.join(BASE_DIR, 'apps/chatbot/templates/static')
+    os.path.join(BASE_DIR, 'apps/chatbot/templates/static'),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
