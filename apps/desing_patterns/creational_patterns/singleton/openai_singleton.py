@@ -81,12 +81,13 @@ class OpenAISingleton():
         return response_message
 
     @classmethod
-    async def create_full_completion_admin(cls, prompt_complaints: str, prompt_suggestions: str):
+    async def create_year_completion_admin(cls, prompt_complaints: str, prompt_suggestions: str, year: int):
         """
         This method create a new completion message taking full data
 
         :param prompt_complaints: a string being our prompt for complaints
         :param prompt_suggestions: a string being our prompt for suggestions
+        :param year: an integer being our year
         :return: a completion message
         """
 
@@ -127,7 +128,7 @@ class OpenAISingleton():
         suggestions_percentages = suggestions_response.percentages
 
         # Getting number of complaints and suggestions by month
-        number_complaints_suggestions_by_month = await GoogleSheetManager.get_number_complaints_suggestions_by_month()
+        number_complaints_suggestions_by_month = await GoogleSheetManager.get_number_complaints_suggestions_by_month(year)
 
         # Making graphs
         complaints_graph = GraphManager.create_graph('Quejas',

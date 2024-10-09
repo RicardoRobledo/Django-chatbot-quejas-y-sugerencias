@@ -4,10 +4,9 @@ from apps.desing_patterns.creational_patterns.singleton.openai_singleton import 
 from apps.base.utils.managers import GoogleSheetManager, PromptManager
 
 
-async def full_completion():
+async def completion_by_year(year: int):
 
-    # Getting full table
-    json_table = await GoogleSheetManager.convert_full_table()
+    json_table = await GoogleSheetManager.get_complaints_suggestions_by_year(year)
 
     # Making prompts
     complaints_prompt = await PromptManager.read_prompt('prompt_admin_complaints')
@@ -18,17 +17,14 @@ async def full_completion():
     suggestions_result = PromptManager.fill_out_prompt(
         suggestions_prompt, {'json_table': json_table})
 
-    response = await OpenAISingleton.create_full_completion_admin(complaints_result, suggestions_result)
+    response = await OpenAISingleton.create_year_completion_admin(complaints_result, suggestions_result, year)
 
     return response
 
 
-async def completion_by_month(month: str):
+async def completion_by_month_year(month: int, year: int):
 
-    # Obtener el año actual
-    current_year = datetime.now().year
-
-    json_table = await GoogleSheetManager.get_complaints_suggestions_by_month_and_year(month, current_year)
+    json_table = await GoogleSheetManager.get_complaints_suggestions_by_month_and_year(month, year)
 
     # Making prompts
     complaints_prompt = await PromptManager.read_prompt('prompt_admin_complaints')
@@ -39,6 +35,6 @@ async def completion_by_month(month: str):
     suggestions_result = PromptManager.fill_out_prompt(
         suggestions_prompt, {'json_table': json_table})
 
-    response = await OpenAISingleton.create_month_completion_admin(complaints_result, suggestions_result)
+    response = await OpenAISingleton.create_year_completion_admin(complaints_result, suggestions_result, year)
 
     return response

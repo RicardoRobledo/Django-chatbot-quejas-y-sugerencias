@@ -113,6 +113,13 @@
   background-color: rgba(0, 0, 0, 0.5); /* Oscurece el fondo con 50% de opacidad */
 }
 
+#select-year-container {
+  display: flex;
+  align-items: center; /* Alinea verticalmente el texto y el select */
+  gap: 10px; /* Espacio entre el h2 y el select */
+  margin-bottom: 10px;
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

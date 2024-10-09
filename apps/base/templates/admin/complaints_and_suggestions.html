@@ -21,7 +21,22 @@
 <!-- Contenido principal -->
 <div class="content-container">
   <!-- Título encima de todo -->
-  <h1>Estadísticas de quejas y sugerencias - {% now "Y" %}</h1>
+  <div id="title-container">
+    <h1>Estadísticas de quejas y sugerencias</h1>
+  </div>
+
+  <div class="d-flex flex-row" id="select-year-container">
+    <h3>Seleccione el año:</h3>
+    <select id="select-year" style="width: 150px;">
+      <option value="">---------</option>
+    </select>
+    <form>
+      {% csrf_token %}
+      <div class="submit-row center-text">
+        <input type="submit" value="Consultar año" class="default" id="btn-consult-year">
+      </div>
+    </form>
+  </div>
 
   <!-- Contenedor que agrupa la tabla, el botón y la imagen en el mismo nivel -->
   <div class="main-content">
@@ -42,7 +57,7 @@
       <form>
         {% csrf_token %}
         <div class="submit-row center-text" style="margin-top: 20px;">
-          <input type="submit" value="Consultar" class="default" id="btn-consult">
+          <input type="submit" value="Consultar quejas y sugerencias" class="default" id="btn-consult">
         </div>
       </form>
     </div>

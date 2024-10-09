@@ -89,7 +89,7 @@ class GoogleSheetManager():
         return adjusted_text
 
     @classmethod
-    async def get_number_complaints_suggestions_by_month(cls):
+    async def get_number_complaints_suggestions_by_month(cls, year):
 
         # Read the google sheet
         result = await cls.read_google_sheets()
@@ -98,19 +98,18 @@ class GoogleSheetManager():
         result['Fecha del mensaje'] = pd.to_datetime(
             result['Fecha del mensaje'])
 
-        # Get the current year
-        current_year = datetime.now().year
-
         # Filtrar filas por el año actual
-        result_current_year = result[result['Fecha del mensaje'].dt.year == current_year].copy(
+        filtered_result = result[result['Fecha del mensaje'].dt.year == year].copy(
         )
 
+        print(filtered_result[:10])
+
         # Crear una nueva columna para el número del mes (evitar advertencia con .loc)
-        result_current_year.loc[:, 'Numero de quejas por mes'] = result_current_year['Fecha del mensaje'].dt.month.astype(
+        filtered_result.loc[:, 'Numero de quejas por mes'] = filtered_result['Fecha del mensaje'].dt.month.astype(
             int)
 
         # Agrupar por el número del mes y contar el número de quejas/sugerencias por mes
-        complaints_by_month = result_current_year.groupby(
+        complaints_by_month = filtered_result.groupby(
             'Numero de quejas por mes').size()
 
         # Crear un diccionario con el nombre del mes en español
@@ -130,7 +129,34 @@ class GoogleSheetManager():
         return complaints_by_month_dict
 
     @classmethod
-    async def get_complaints_suggestions_by_month_and_year(cls, month: int, year: int):
+    async def get_complaints_suggestions_by_year(cls, year: str):
+        """
+        This method filters the complaints and suggestions based on a given year.
+
+        :param year: The year to filter
+        :return: A list of complaints for the specified month and year
+        """
+
+        result = await cls.read_google_sheets()
+
+        # Convertir 'Fecha del mensaje' a datetime
+        result['Fecha del mensaje'] = pd.to_datetime(
+            result['Fecha del mensaje'])
+
+        # Filtrar por el año actual
+        filtered_result = result[result['Fecha del mensaje'].dt.year == year]
+
+        json_data = filtered_result.to_json(
+            orient='records', lines=True, force_ascii=False)
+
+        # Limiting the number of tokens
+        adjusted_text = TokenManager.fit_token_limit(
+            json_data[-settings.TOKEN_LIMIT:])
+
+        return adjusted_text
+
+    @classmethod
+    async def get_complaints_suggestions_by_month_and_year(cls, month: str, year: str):
         """
         This method filters the complaints and suggestions based on a given month and year.
 
@@ -145,11 +171,8 @@ class GoogleSheetManager():
         result['Fecha del mensaje'] = pd.to_datetime(
             result['Fecha del mensaje'])
 
-        # Obtener el año actual
-        current_year = datetime.now().year
-
         # Filtrar por el año actual
-        result_current_year = result[result['Fecha del mensaje'].dt.year == current_year]
+        result_current_year = result[result['Fecha del mensaje'].dt.year == year]
 
         # Filtrar por el mes solicitado
         filtered_result = result_current_year[result_current_year['Fecha del mensaje'].dt.month == month]

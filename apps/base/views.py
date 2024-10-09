@@ -1,8 +1,10 @@
+import json
 from http import HTTPStatus
 
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views import View
 
 from apps.base.utils.managers import GoogleSheetManager
@@ -20,28 +22,34 @@ async def custom_admin_view(request):
     return render(request, 'admin/complaints_and_suggestions.html')
 
 
-class FullStatisticsView(View):
+class YearStatisticsView(View):
 
-    async def get(self, request, *args, **kwargs):
+    async def post(self, request, *args, **kwargs):
         """
-        This method return the full completion view
+        This method return a completion given a year
         """
 
-        response = await completions_repository.full_completion()
+        data = json.loads(request.body)
+        year = data.get('year')
+
+        response = await completions_repository.completion_by_year(year)
         return JsonResponse(response)
 
 
-class MonthStatisticsView(View):
+class YearMonthStatisticsView(View):
 
-    async def get(self, request, month, *args, **kwargs):
+    async def post(self, request, *args, **kwargs):
         """
-        This method return a completion given a month
+        This method return a completion given a month and year
         """
 
         try:
 
-            month = int(month)
-            response = await completions_repository.completion_by_month(int(month))
+            data = json.loads(request.body)
+            month = data.get('month')
+            year = data.get('year')
+
+            response = await completions_repository.completion_by_month_year(int(month), int(year))
             return JsonResponse(response, status=HTTPStatus.OK)
 
         except ValueError:
