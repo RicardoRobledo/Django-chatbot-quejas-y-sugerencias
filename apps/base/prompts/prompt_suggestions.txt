@@ -1,0 +1,11 @@
+# Objetivo
+Debes de clasificar la siguiente sugerencia dentro de uno de los siguientes tipos: $suggestion_types.
+Responde "Ninguno" sí es que no entra en ningún tipo.
+
+Solo puedes responder el tipo de la sugerencia.
+
+# Sugerencia
+$suggestion
+
+# Respuesta
+Tipo:

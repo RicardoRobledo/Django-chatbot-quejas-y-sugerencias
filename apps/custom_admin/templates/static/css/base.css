@@ -1,0 +1,14 @@
+nav {
+    background-color: #352754 !important;
+}
+
+nav a{
+    background-color: #2c2c3e !important;
+    border-color: white !important;
+    color: white !important;
+}
+
+nav a:hover {
+    background-color: #3e3e57 !important;
+    color: white !important;
+}

@@ -27,11 +27,6 @@ def startup():
     print(OpenAISingleton())
     print('OpenAISingleton initialized!')
 
-    print('Configuring matplotlib...')
-    import matplotlib
-    matplotlib.use('Agg')
-    print('matplotlib configured!')
-
 
 startup()
 application = get_wsgi_application()

@@ -1,0 +1,151 @@
+{% extends "custom_admin/base.html" %}
+
+{% load static %}
+
+{% block title %}Responsive Bar Chart with D3.js and Bootstrap{% endblock %}
+
+{% block content %}
+
+<div id="body-content-container">
+
+  {% csrf_token %}
+
+        <div class="row">
+
+            <!-- Columna para el texto -->
+            <div class="col-md-6 d-flex align-items-center justify-content-center">
+              <div class="column d-flex flex-column align-items-center justify-content-center">
+
+                <div class="d-flex justify-content-start align-items-center mb-3">
+                  <h4 for="select-year" class="text-white me-3 mb-0">Año:</h4>
+                  <select id="select-year" class="form-select form-select-sm shadow-sm">
+                    {% for year in years %}
+                      <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+              <table class="table table-hover table-striped mx-4 border border-2 border-white">
+                <thead class="table-dark" style="background-color: #1e1e2f; color: #ffffff;">
+                  <tr>
+                    <th scope="col" class="text-center">Mes</th>
+                    <th scope="col" class="text-center">Cantidad de Quejas y Sugerencias</th>
+                    <th scope="col" class="text-center">Mes a Consultar</th>
+                  </tr>
+                </thead>
+                <tbody style="background-color: #2c2c3e;">
+                  <tr id="january-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-1">Enero</th>
+                    <td class="text-center" style="color: #ffffff;" id="january-count">45</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="1" /></td>
+                  </tr>
+                  <tr id="february-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-2">Febrero</th>
+                    <td class="text-center" style="color: #ffffff;" id="february-count">38</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="2" /></td>
+                  </tr>
+                  <tr id="march-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-3">Marzo</th>
+                    <td class="text-center" style="color: #ffffff;" id="march-count">50</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="3" /></td>
+                  </tr>
+                  <tr id="april-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-4">Abril</th>
+                    <td class="text-center" style="color: #ffffff;" id="april-count">33</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="4" /></td>
+                  </tr>
+                  <tr id="may-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-5">Mayo</th>
+                    <td class="text-center" style="color: #ffffff;" id="may-count">41</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="5" /></td>
+                  </tr>
+                  <tr id="june-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-6">Junio</th>
+                    <td class="text-center" style="color: #ffffff;" id="june-count">27</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="6" /></td>
+                  </tr>
+                  <tr id="july-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-7">Julio</th>
+                    <td class="text-center" style="color: #ffffff;" id="july-count">48</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="7" /></td>
+                  </tr>
+                  <tr id="august-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-8">Agosto</th>
+                    <td class="text-center" style="color: #ffffff;" id="august-count">36</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="8" /></td>
+                  </tr>
+                  <tr id="september-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-9">Septiembre</th>
+                    <td class="text-center" style="color: #ffffff;" id="septemer-count">42</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="9" /></td>
+                  </tr>
+                  <tr id="october-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-10">Octubre</th>
+                    <td class="text-center" style="color: #ffffff;" id="october-count">39</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="10" /></td>
+                  </tr>
+                  <tr id="november-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-11">Noviembre</th>
+                    <td class="text-center" style="color: #ffffff;" id="november-count">46</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="11" /></td>
+                  </tr>
+                  <tr id="december-row">
+                    <th scope="row" class="text-center" style="color: #ffffff;" id="month-12">Diciembre</th>
+                    <td class="text-center" style="color: #ffffff;" id="december-count">51</td>
+                    <td class="text-center"><input type="radio" name="selectedMonth" value="12" /></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="table-loader-container">
+                <div id="table-statistics-loader">
+                  <div class="loader"></div>
+                </div>
+              </div>
+              <button class="rounded btn btn btn-success text-white mt-2" id="btn-download-excel">Descargar excel</button>
+              </div>
+            </div>
+
+            <!-- Columna para las gráficas
+            <div class="col-md-6 d-flex flex-column align-items-center justify-content-center">
+              <div class="bar-chart container-fluid my-4">
+                <div id="bar-chart-complaints"></div>
+                
+              </div>
+              <div class="bar-chart container-fluid mb-4">
+                <div id="bar-chart-suggestions"></div>
+                <div id="bar-chart-suggestions-loader">
+                  <div class="loader"></div>
+                </div>
+              </div>
+            </div>-->
+
+            <div class="col-md-6 mb-2">
+              <div class="card bg-dark text-white shadow-lg border-0 h-100">
+                <div class="card-body p-4 d-flex flex-column align-items-center justify-content-center">
+                  
+                  <!-- Gráfica de quejas -->
+                  <div class="bar-chart mb-4">
+                    <div id="bar-chart-complaints"></div>
+                    <div id="bar-chart-complaints-loader">
+                      <div class="loader"></div>
+                    </div>
+                  </div>
+            
+                  <!-- Gráfica de sugerencias -->
+                  <div class="bar-chart">
+                    <div id="bar-chart-suggestions"></div>
+                    <div id="bar-chart-suggestions-loader">
+                      <div class="loader"></div>
+                    </div>
+                  </div>
+            
+                </div>
+              </div>
+            </div>
+      
+          </div>
+    </div>
+  
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script src="{% static 'js/complaints_and_suggestions.js' %}"></script>
+{% endblock %}

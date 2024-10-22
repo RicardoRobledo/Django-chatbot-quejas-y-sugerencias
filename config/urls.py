@@ -21,9 +21,10 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('custom_admin/', include('apps.base.controllers.urls',
-         namespace='base_app')),
+    path('panel-control/', admin.site.urls),
+    path('', include('apps.users.controllers.urls', namespace='users_app')),
+    path('custom-admin/', include('apps.custom_admin.controllers.urls',
+         namespace='custom_admin_app')),
     path('authentication/', include('apps.authentication.urls',
          namespace='authentication_app')),
     path('chatbot/', include('apps.chatbot.controllers.urls', namespace='chatbot_app')),

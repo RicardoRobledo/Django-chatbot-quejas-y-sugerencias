@@ -1,0 +1,8 @@
+# Objetivo
+Debes de leer el siguiente mensaje escrito por un usuario que es una "Queja" o "Sugerencia" y clasificarla como
+tal, solo puedes responder "Queja" o "Sugerencia".
+
+# Mensaje de usuario
+$complaint_suggestion
+
+Clasificación:

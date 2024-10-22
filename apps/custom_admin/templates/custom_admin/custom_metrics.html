@@ -1,0 +1,50 @@
+{% extends "custom_admin/base.html" %}
+
+{% load static %}
+
+{% block title %}Métricas personalizadas{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/custom_metrics.css' %}" />
+
+{% csrf_token %}
+
+<section class="container">
+    <div class="row g-4 justify-content-between">
+        <!-- Formulario 1 -->
+        <div class="col-md-5 p-4 rounded mb-4 form-container">
+            <h3 class="text-center mb-4">Métricas de quejas</h3>
+            <form id="form-complaints">
+                {% for complaint_type in complaint_types %}
+                <div class="mb-3 d-flex align-items-center">
+                    <input type="checkbox" class="form-check-input me-2" id="complaint-checkbox-{{ forloop.counter }}">
+                    <input type="text" class="form-control" id="complaint-type-{{forloop.counter}}" aria-describedby="metric1Help" value="{{complaint_type}}" disabled>
+                </div>
+                {% endfor %}
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="button" class="btn btn-primary" id="add-complaint-button">Agregar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Formulario 2 -->
+        <div class="col-md-5 p-4 rounded mb-4 form-container">
+            <h3 class="text-center mb-4">Métricas de sugerencias</h3>
+            <form id="form-suggestions">
+                {% for suggestion_type in suggestion_types %}
+                <div class="mb-3 d-flex align-items-center">
+                    <input type="checkbox" class="form-check-input me-2" id="suggestion-checkbox-{{ forloop.counter }}">
+                    <input type="text" class="form-control" id="suggestion-type-{{forloop.counter}}" aria-describedby="metric1Help" value="{{suggestion_type}}" disabled>
+                </div>
+                {% endfor %}
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="button" class="btn btn-primary" id="add-suggestion-button">Agregar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="{% static 'js/custom_metrics.js' %}"></script>
+{% endblock %}

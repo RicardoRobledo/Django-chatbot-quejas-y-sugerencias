@@ -37,7 +37,6 @@ class CreateThreadView(View):
         dates = body.get('dates')
 
         thread_id = await OpenAISingleton.create_thread()
-        print(thread_id)
 
         num_tokens = await chatbot_repository.send_date_range(thread_id.id, dates)
         return JsonResponse(data={'thread_id': thread_id.id, 'num_tokens': num_tokens}, status=HTTPStatus.OK)

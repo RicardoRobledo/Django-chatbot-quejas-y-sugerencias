@@ -29,6 +29,7 @@ APPS = [
     'apps.base',
     'apps.authentication',
     'apps.users',
+    'apps.custom_admin',
     'apps.chatbot',
 ]
 
@@ -70,7 +71,9 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
             os.path.join(BASE_DIR, 'apps/frontend/templates'),
-            os.path.join(BASE_DIR, 'apps/chatbot/templates')
+            os.path.join(BASE_DIR, 'apps/custom_admin/templates'),
+            os.path.join(BASE_DIR, 'apps/chatbot/templates'),
+            os.path.join(BASE_DIR, 'apps/users/templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -132,6 +135,7 @@ USE_TZ = True
 LOGIN_REDIRECT_URL = '/chatbot/chat/'
 LOGOUT_REDIRECT_URL = '/authentication/login/'
 LOGIN_URL = '/authentication/login/'
+CUSTOM_PANEL_CONTROL_LOGIN_URL = '/authentication/custom-panel-control-login/'
 
 AUTH_USER_MODEL = 'users.UserModel'
 
@@ -159,9 +163,10 @@ BASE_URL_APP = config('BASE_URL_APP')
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'apps/base/templates/static'),
     os.path.join(BASE_DIR, 'apps/authentication/templates/static'),
+    os.path.join(BASE_DIR, 'apps/custom_admin/templates/static'),
     os.path.join(BASE_DIR, 'apps/chatbot/templates/static'),
+    os.path.join(BASE_DIR, 'apps/users/templates/static'),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 

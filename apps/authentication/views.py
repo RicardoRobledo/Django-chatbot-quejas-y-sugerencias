@@ -34,10 +34,10 @@ class LoginView(View):
         """
         This method return our login view
         """
-        
-        response = render(request, self.template_name, {'form': self.form_class})
+
+        response = render(request, self.template_name,
+                          {'form': self.form_class})
         return response
-    
 
     async def post(self, request, *args, **kwargs):
         """
@@ -58,4 +58,44 @@ class LoginView(View):
 
         await sync_to_async(login)(request, user)
 
-        return JsonResponse(data={'redirect_url':self.success_url}, status=HTTPStatus.FOUND)
+        return JsonResponse(data={'redirect_url': self.success_url}, status=HTTPStatus.FOUND)
+
+
+class CustomPanelControlLoginView(View):
+
+    form_class = LoginForm
+    template_name = 'authentication/custom_panel_control_login.html'
+    success_url = reverse_lazy('custom_admin_app:admin_home_view')
+
+    async def get(self, request, *args, **kwargs):
+        """
+        This method return our login view
+        """
+
+        response = render(request, self.template_name,
+                          {'form': self.form_class})
+        return response
+
+    async def post(self, request, *args, **kwargs):
+        """
+        This method validates the login form.
+        """
+        form = self.form_class(request.POST)
+
+        is_valid = await sync_to_async(form.is_valid)()
+        if not is_valid:
+            return HttpResponse(content='Error, invalid form', status=HTTPStatus.BAD_REQUEST)
+
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+
+        user = await sync_to_async(authenticate)(request, username=username, password=password)
+        if not user:
+            return HttpResponse(content='Error, user not found', status=HTTPStatus.NOT_FOUND)
+
+        if not await sync_to_async(lambda: user.is_staff)():
+            return HttpResponse(content='Error, access denied, user is not staff', status=HTTPStatus.FORBIDDEN)
+
+        await sync_to_async(login)(request, user)
+
+        return JsonResponse(data={'redirect_url': self.success_url}, status=HTTPStatus.FOUND)
