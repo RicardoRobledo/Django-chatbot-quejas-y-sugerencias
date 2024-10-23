@@ -1,5 +1,5 @@
-const url = 'http://127.0.0.1:8000';
-//const url = 'https://django-chatbot-quejas-y-sugerencias.onrender.com';
+//const url = 'http://127.0.0.1:8000';
+const url = 'https://django-chatbot-quejas-y-sugerencias.onrender.com';
 
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
