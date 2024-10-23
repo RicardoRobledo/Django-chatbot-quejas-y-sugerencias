@@ -211,13 +211,15 @@ async def update_suggestion_types(suggestions):
         return JsonResponse({'msg': 'Suggestionss updated or created as needed'}, status=HTTPStatus.CREATED)
 
 
-async def get_admin_metrics():
+def get_admin_metrics():
     """
-    This function return the suggestions types and complaint types in use
+    This function returns the suggestions types and complaint types in use
     """
 
-    complaint_types = await sync_to_async(list)(ComplaintTypeModel.objects.filter(in_use=True).values_list('name', flat=True))
-    suggestion_types = await sync_to_async(list)(SuggestionTypeModel.objects.filter(in_use=True).values_list('name', flat=True))
+    complaint_types = list(ComplaintTypeModel.objects.filter(
+        in_use=True).values_list('name', flat=True))
+    suggestion_types = list(SuggestionTypeModel.objects.filter(
+        in_use=True).values_list('name', flat=True))
 
     return {'complaint_types': complaint_types, 'suggestion_types': suggestion_types}
 

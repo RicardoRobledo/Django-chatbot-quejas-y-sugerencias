@@ -66,12 +66,12 @@ class AdminHomeView(View):
 @method_decorator(never_cache, name='dispatch')
 class AdminMetricsView(View):
 
-    async def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         """
         This method returns the metrics of the complaints and suggestions.
         """
 
-        metrics = await complaints_and_suggestions_repository.get_admin_metrics()
+        metrics = complaints_and_suggestions_repository.get_admin_metrics()
 
         return render(request, 'custom_admin/custom_metrics.html', context=metrics)
 

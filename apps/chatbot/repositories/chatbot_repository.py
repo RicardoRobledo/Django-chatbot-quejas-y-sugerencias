@@ -76,7 +76,7 @@ async def send_date_range(thread_id: str, dates: dict):
 
     df_combined = pd.concat([df_complaints, df_suggestions], ignore_index=True)
     df_combined['Fecha de creación'] = pd.to_datetime(
-        df_combined['Fecha de creación']).dt.date
+        df_combined['Fecha de creación']).dt.strftime('%d-%m-%Y')
 
     json_table = df_combined.to_json(
         orient='records', lines=True, force_ascii=False)
